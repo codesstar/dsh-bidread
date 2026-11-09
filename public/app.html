@@ -106,12 +106,18 @@ window.BIDREAD_ADAPTER = {
   };
   // 当前项目和原文文字交给工作台后端，右侧 DSH 对话里的智能体用工具读取
   const post = (url, body, method) => fetch(url, { method: method || 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); });
+  let cur = null
   AD.dsh = {
     // 告诉后端当前项目，同时告诉外层面板（它据此为这个项目打开对应的 DSH 会话）
-    setCurrent: (pid, name) => fetch('/api/bidread/current', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pid }) })
-      .then(r => r.json()).then(r => { if (window.parent !== window) window.parent.postMessage({ type: 'bidread:project', pid, name, folder: r.folder }, location.origin); }),
-    // 打开 / 收起右侧 DSH 对话
-    toggleChat: () => { if (window.parent !== window) window.parent.postMessage({ type: 'bidread:chat' }, location.origin); },
+    setCurrent: (pid, name) => { cur = { pid, name }; return fetch('/api/bidread/current', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pid }) })
+      .then(r => r.json()).then(r => { if (window.parent !== window) window.parent.postMessage({ type: 'bidread:project', pid, name, folder: r.folder }, location.origin); }); },
+    // 打开 / 收起右侧 DSH 对话。先按当前项目名刷新一次工作区文件夹（项目可能在解读后自动改了名）
+    toggleChat: () => {
+      if (window.parent === window) return;
+      const go = () => window.parent.postMessage({ type: 'bidread:chat' }, location.origin);
+      const name = (typeof P !== 'undefined' && P.cur?.name) || cur?.name || '';   // P 是页面脚本里的顶层 const，不在 window 上
+      cur?.pid ? AD.dsh.setCurrent(cur.pid, name).catch(() => {}).finally(go) : go();
+    },
     saveText: (pid, files) => post('/api/bidread/projects/' + pid + '/text', files, 'PUT')
   };
   // 写进 DSH 会话的输入框：交给外层面板（lib/client.js）处理
