@@ -40,7 +40,17 @@ DSH Desktop 工作台：把一个招标项目的全套资料（招标文件正�
 
 ## 安装
 
-在 DSH Desktop 的工作台市场中安装（收录后）。也可以下载 [Release](https://github.com/codesstar/dsh-bidread/releases/latest) 里的 `dsh-bidread.tgz`，用 DSH 的插件命令安装：`dsh plugin --profile web add ./dsh-bidread.tgz`，然后重启 DSH Desktop。
+需要 DSH Desktop 0.13 或更高版本。
+
+- **工作台市场**（收录后）：Workbenches → Market 里搜“招标文件解读”，点 Install。
+- **现在就装**：在 DSH Desktop 里新建一个普通会话，把下面这段话发给 AI：
+
+  > 请把 https://github.com/codesstar/dsh-bidread/releases/latest/download/dsh-bidread.tgz 下载到本机，然后用 install_local_workbench 工具安装这个工作台。
+
+  装好后如果提示重启 Harness，按提示重启，再从左上角 Workbenches 切到“招标文件解读”。
+- **命令行**：下载上面的 `dsh-bidread.tgz`，运行 `dsh plugin --profile web add ./dsh-bidread.tgz`，然后重启 DSH Desktop。
+
+首次使用前在 DSH 的 Settings → Models 里配好一个模型。
 
 ## 目录
 
