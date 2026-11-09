@@ -1,0 +1,66 @@
+{
+  "name": "dsh-bidread",
+  "version": "0.2.0",
+  "description": "招标文件解读工作台：上传一个招标项目的全套资料，解读项目速览、补遗变更、废标风险、评分办法和材料清单，每条结论都能点回原文核对。",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "workbench",
+    "工作台",
+    "招投标",
+    "招标文件",
+    "投标"
+  ],
+  "license": "MIT",
+  "author": "codesstar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codesstar/dsh-bidread.git"
+  },
+  "homepage": "https://github.com/codesstar/dsh-bidread#readme",
+  "bugs": {
+    "url": "https://github.com/codesstar/dsh-bidread/issues"
+  },
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "src",
+    "lib",
+    "public",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node --check src/index.js && node --check src/store.js && node --check src/llm.js && node --check src/tools.js && node --check lib/client.js",
+    "pack:release": "npm pack && mv dsh-bidread-*.tgz dsh-bidread.tgz"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "dsh-desktop-workbenches"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.1 <5.0.0-0",
+    "@deepseek-ai/dsh-host-webserver": ">=0.1.5-rc.2 <0.3.0-0",
+    "@deepseek-ai/dsh-client-connection": ">=0.1.5-rc.2 <0.3.0-0",
+    "@deepseek-ai/schemastery": ">=3.18.2 <4.0.0-0",
+    "@deepseek-ai/dsh-tools": ">=0.1.5-rc.2 <0.3.0-0"
+  }
+}

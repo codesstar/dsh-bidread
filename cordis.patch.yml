@@ -1,0 +1,6 @@
+# 招标文件解读工作台：数据放在 DSH 数据目录下的 bidread 文件夹
+- insert:
+    - id: dsh-bidread
+      name: dsh-bidread
+      config:
+        root: !!js dshHomePath('bidread')
