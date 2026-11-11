@@ -8,7 +8,7 @@ import { existsSync } from 'node:fs'
 import { join, basename } from 'node:path'
 import { randomBytes } from 'node:crypto'
 
-const ID_RE = /^p\d{8}-\d{6}-[0-9a-f]{4}$/
+export const ID_RE = /^p\d{8}-\d{6}-[0-9a-f]{4}$/
 const TRASH_RE = /^(p\d{8}-\d{6}-[0-9a-f]{4})-(\d+)$/
 export class NotFound extends Error {}
 export class Conflict extends Error {}

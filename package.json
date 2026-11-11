@@ -1,6 +1,6 @@
 {
   "name": "dsh-bidread",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "招标文件解读工作台：上传一个招标项目的全套资料，解读项目速览、补遗变更、废标风险、评分办法和材料清单，每条结论都能点回原文核对。",
   "keywords": [
     "dsh",
@@ -43,7 +43,8 @@
   },
   "scripts": {
     "check": "node --check src/index.js && node --check src/store.js && node --check src/llm.js && node --check src/tools.js && node --check lib/client.js",
-    "pack:release": "npm pack && mv dsh-bidread-*.tgz dsh-bidread.tgz"
+    "pack:release": "npm pack && mv dsh-bidread-*.tgz dsh-bidread.tgz",
+    "test": "node --test test/*.test.mjs"
   },
   "dsh": {
     "bundle": {

@@ -4,7 +4,7 @@
 //   - 数据放在 DSH 数据目录（cordis.patch.yml 里的 dshHomePath('bidread')）。
 import Schema from '@deepseek-ai/schemastery'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import { readFile, mkdtemp, writeFile, rm, readdir } from 'node:fs/promises'
+import { readFile, mkdtemp, writeFile, rm, readdir, realpath } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, join, extname } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -104,8 +104,11 @@ export function apply(ctx, config) {
       const b = JSON.parse((await readBody(req)).toString() || '{}')
       currentPid = typeof b.pid === 'string' && b.pid ? b.pid : null
       await writeFile(currentPath, JSON.stringify({ pid: currentPid }), 'utf8')
-      // 面板为这个项目建 DSH 会话时，用项目资料所在文件夹作工作区
-      return send(res, 200, { ok: true, folder: currentPid ? join(config.root, currentPid) : null })
+      // 面板为这个项目建 DSH 会话时，用项目资料所在文件夹作工作区。返回真实路径（DSH 记录工作区用的也是真实路径），
+      // 面板据此按完整路径找到要改名的工作区
+      let folder = null
+      if (currentPid) { await store.get(currentPid); folder = await realpath(join(config.root, currentPid)) }
+      return send(res, 200, { ok: true, folder })
     }
     if (path === PREFIX + 'llm' && req.method === 'POST') {
       const { prompt } = JSON.parse((await readBody(req)).toString() || '{}')
@@ -143,8 +146,7 @@ export function apply(ctx, config) {
     return send(res, 404, { error: 'not found' })
   }
 
-  // ---------- DSH 智能体工具：只挂在归属本工作台的会话上 ----------
-  const tools = createTools({ defineTool, store, current: () => currentPid })
+  // ---------- DSH 智能体工具：只挂在归属本工作台的会话上，每个会话一套，只读这个会话所属的项目 ----------
   const mounted = new Map()
   // 本地安装时工作台 ID 是 local:dsh-bidread，上架后是“GitHub 账号/仓库”
   const isOurs = id => typeof id === 'string' && (id === 'local:dsh-bidread' || /\/dsh-bidread$/i.test(id))
@@ -155,7 +157,7 @@ export function apply(ctx, config) {
     try {
       const snap = await ctx.desktopWorkbenchOwnership.read()
       if (!owns(snap, agent.id)) return detach(agent.id)
-      if (!mounted.has(agent.id)) mounted.set(agent.id, tools.map(t => agent.ctx.tools.register(t)))
+      if (!mounted.has(agent.id)) mounted.set(agent.id, createTools({ defineTool, store, agent }).map(t => agent.ctx.tools.register(t)))
     } catch { detach(agent.id) }   // 读不到归属就不给工具
   }
   async function reconcileAll() {
