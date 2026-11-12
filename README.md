@@ -10,7 +10,7 @@ DSH Desktop 工作台：把一个招标项目的全套资料（招标文件正�
 |---|---|---|
 | ![补遗变更](docs/images/02-changes.png) | ![评分拆解](docs/images/03-scoring.png) | ![材料清单](docs/images/04-materials.png) |
 
-截图来自 DSH Desktop 0.13.2 中安装的 v0.2.0，使用随包附带的虚构示例项目。
+截图来自 DSH Desktop 0.13.2（深色主题）中安装的 v0.3.0，使用随包附带的虚构示例项目。
 
 ## 功能
 
