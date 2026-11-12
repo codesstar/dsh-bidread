@@ -153,33 +153,45 @@ window.BIDREAD_ADAPTER = {
     s.setProperty('--line',mix(dark?10:9)); s.setProperty('--line-strong',mix(dark?18:16));
     if(v('label-primary')) s.setProperty('--ink',v('label-primary'));
     if(v('label-secondary')) s.setProperty('--muted',v('label-secondary'));
+    // 视觉规范：主按钮用宿主的中性对比色，业务蓝只用于链接、出处和状态；没有对应 token 时保留本页的回退值
+    var map={'--primary':'button-primary-fill','--on-primary':'label-primary-foreground','--accent':'state-business-primary','--blue':'state-business-primary','--faint':'label-tertiary','--hover':'interactive-bg-hover','--line-strong':'border-l3'};
+    for(var k in map){ var x=v(map[k]); if(x) s.setProperty(k,x); else s.removeProperty(k); }
+    if(!v('state-business-primary')&&v('link')){ s.setProperty('--accent',v('link')); s.setProperty('--blue',v('link')); }
+    var font=cs.getPropertyValue('--dsw-font-family').trim()||cs.fontFamily; if(font) s.setProperty('--f-body',font);
   }
   apply();
   try{ new MutationObserver(apply).observe(pd.documentElement,{attributes:true}); if(pd.body) new MutationObserver(apply).observe(pd.body,{attributes:true}); }catch(e){}
   try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',apply); }catch(e){}
 })();</script>
 <style>
-/* Layout: desktop workbench — left pane shows the original files (tabs per file, rendered as the real PDF/Word/Excel), right pane is the analysis; every finding links to a file + page */
+/* Layout: desktop workbench — left pane shows the original files (tabs per file, rendered as the real PDF/Word/Excel), right pane is the analysis; every finding links to a file + page
+   视觉按《DSH 内嵌业务系统视觉设计规范》：中性白 / 炭黑底，中性文字；主按钮用宿主的黑白对比色（--primary），
+   业务蓝（--accent）只用于链接、出处按钮、聚焦和状态；控件圆角 12px（紧凑 8px），卡片 12px，标签 6px；字体跟随系统和宿主。
+   嵌在 DSH 里时由开头的脚本把这些变量换成宿主的语义 token（--dsw-alias-*）。 */
 :root{
-  --bg:#f3f4f6; --surface:#ffffff; --ink:#1b2130; --muted:#5f6778; --faint:#8a91a0; --line:#dfe2e8; --line-strong:#c9ced8;
-  --accent:#1f4fa3; --accent-soft:#e6edf9; --accent-ink:#ffffff;
-  --red:#b4372a; --red-soft:#fbe9e6; --amber:#9a6200; --amber-soft:#fdf2db; --green:#2c7a4b; --green-soft:#e3f2e9; --blue:#2b5fb4; --blue-soft:#e7eefa;
-  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  --f-doc:"Noto Serif SC","Songti SC","SimSun",serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --bg:#f6f7f8; --surface:#ffffff; --ink:#0f1115; --muted:#61666b; --faint:#81858c; --line:#e7e8ea; --line-strong:#d4d6d9;
+  --accent:#4176e6; --accent-soft:#eef3fd; --accent-ink:#ffffff;
+  --primary:#0f1115; --on-primary:#ffffff; --hover:rgba(15,17,21,.05);
+  --red:#c4372b; --red-soft:#fcebe8; --amber:#a35f00; --amber-soft:#fdf3de; --green:#2b7a4b; --green-soft:#e4f2e9; --blue:#4176e6; --blue-soft:#eef3fd;
+  --r-ctl:12px; --r-sm:8px; --r-tag:6px; --r-card:12px;
+  --f-body:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+  --f-doc:"Songti SC","SimSun","Noto Serif SC",serif;
+  --f-mono:var(--f-body);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#13161c; --surface:#1b1f27; --ink:#e7e9ee; --muted:#a2a9b8; --faint:#7d8494; --line:#2d323d; --line-strong:#3c4250;
-  --accent:#8db0f0; --accent-soft:#1f2a40; --accent-ink:#0f1520;
-  --red:#f08a7c; --red-soft:#3a201c; --amber:#f0be5a; --amber-soft:#382c13; --green:#7fd0a0; --green-soft:#16301f; --blue:#8db0f0; --blue-soft:#1d2840; color-scheme:dark}}
+  --bg:#151517; --surface:#1c1c1f; --ink:#f9fafb; --muted:#cfd3d6; --faint:#adb2b8; --line:#2b2b2f; --line-strong:#3b3b40;
+  --accent:#679efe; --accent-soft:#1d2433; --accent-ink:#0f1115;
+  --primary:#f9fafb; --on-primary:#0f1115; --hover:rgba(255,255,255,.06);
+  --red:#f08a7c; --red-soft:#3a201c; --amber:#f0be5a; --amber-soft:#382c13; --green:#7fd0a0; --green-soft:#16301f; --blue:#679efe; --blue-soft:#1d2433; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#13161c; --surface:#1b1f27; --ink:#e7e9ee; --muted:#a2a9b8; --faint:#7d8494; --line:#2d323d; --line-strong:#3c4250;
-  --accent:#8db0f0; --accent-soft:#1f2a40; --accent-ink:#0f1520;
-  --red:#f08a7c; --red-soft:#3a201c; --amber:#f0be5a; --amber-soft:#382c13; --green:#7fd0a0; --green-soft:#16301f; --blue:#8db0f0; --blue-soft:#1d2840; color-scheme:dark}
+  --bg:#151517; --surface:#1c1c1f; --ink:#f9fafb; --muted:#cfd3d6; --faint:#adb2b8; --line:#2b2b2f; --line-strong:#3b3b40;
+  --accent:#679efe; --accent-soft:#1d2433; --accent-ink:#0f1115;
+  --primary:#f9fafb; --on-primary:#0f1115; --hover:rgba(255,255,255,.06);
+  --red:#f08a7c; --red-soft:#3a201c; --amber:#f0be5a; --amber-soft:#382c13; --green:#7fd0a0; --green-soft:#16301f; --blue:#679efe; --blue-soft:#1d2433; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6;
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6;font-variant-numeric:tabular-nums;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -189,10 +201,10 @@ button{cursor:pointer}
 /* top bar */
 .bar{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding-block:12px;border-bottom:1px solid var(--line)}
 .brand{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;white-space:nowrap}
-.brand i{width:10px;height:14px;border:2px solid var(--accent);border-radius:2px;display:inline-block}
+.brand i{width:10px;height:14px;border:2px solid var(--ink);border-radius:2px;display:inline-block}
 .fileinfo{flex:1 1 260px;min-width:0;display:flex;align-items:center;gap:8px}
 .fname{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:1;padding:4px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;font-weight:500}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:1;padding:4px 8px;border-radius:var(--r-tag);background:var(--accent-soft);color:var(--accent);white-space:nowrap;font-weight:500}
 .chip.red{background:var(--red-soft);color:var(--red)} .chip.amber{background:var(--amber-soft);color:var(--amber)}
 .chip.green{background:var(--green-soft);color:var(--green)} .chip.blue{background:var(--blue-soft);color:var(--blue)}
 .chip.plain{background:transparent;color:var(--muted);border:1px solid var(--line)}
@@ -201,13 +213,13 @@ button{cursor:pointer}
 .countdown b{font-family:var(--f-mono);font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
 .countdown.urgent b{color:var(--red)}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:6px 12px;font-size:13px;white-space:nowrap}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{color:var(--accent-ink);filter:brightness(1.08)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r-ctl);padding:0 14px;font-size:14px;line-height:1.2;white-space:nowrap;transition:background-color .1s,border-color .1s,opacity .1s}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+.btn.primary:hover{background:var(--primary);opacity:.88}
 .btn:disabled{opacity:.5;cursor:default}
-.btn.sm{padding:3px 10px;font-size:12px}
-.notice{flex:0 0 auto;margin-top:10px;padding:8px 12px;border-radius:6px;background:var(--accent-soft);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn.sm{min-height:28px;padding:0 10px;font-size:12px;border-radius:var(--r-sm)}
+.notice{flex:0 0 auto;margin-top:10px;padding:8px 12px;border-radius:var(--r-sm);background:var(--bg);border:1px solid var(--line);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .notice.warn{background:var(--amber-soft)}
 
 /* split */
@@ -215,12 +227,12 @@ button{cursor:pointer}
 .split > *{min-width:0;min-height:0}
 
 /* document pane */
-.doc{background:var(--bg);border:1px solid var(--line);border-radius:8px;overflow:auto;display:flex;flex-direction:column}
+.doc{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-card);overflow:auto;display:flex;flex-direction:column}
 .doc-head{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line);display:flex;flex-direction:column}
 .strip{display:flex;gap:2px;overflow-x:auto;padding:6px 8px 0}
 .ftab{flex:0 0 auto;max-width:220px;display:flex;align-items:center;gap:6px;border:none;background:none;border-bottom:2px solid transparent;padding:6px 8px 8px;font-size:12px;color:var(--muted)}
 .ftab span.n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.ftab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.ftab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
 .doc-sub{display:flex;justify-content:space-between;gap:8px;padding:6px 14px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);flex-wrap:wrap}
 .pages{padding:12px 16px 24px;display:flex;flex-direction:column;gap:16px}
 .pg{scroll-margin-top:96px;display:flex;flex-direction:column;gap:4px}
@@ -256,26 +268,27 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
 .home{display:flex;flex-direction:column;gap:14px;padding:4px 2px 24px}
 .home-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap} .home-head h2{margin:0;font-size:18px} .home-head .sp{flex:1}
 .hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
-.hcard{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-height:132px}
-.hcard:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(20,24,28,.06)}
+.hcard{border:1px solid var(--line);border-radius:var(--r-card);background:var(--surface);padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:8px;cursor:pointer;min-height:132px}
+.hcard:hover{border-color:var(--line-strong);background:var(--hover)}
 .hcard b{font-size:15px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hcard .hb{font-size:12px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hcard .hm{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--muted);margin-top:auto}
 .hbar{height:4px;border-radius:2px;background:var(--line);overflow:hidden} .hbar i{display:block;height:100%;background:var(--accent)}
-.htrash{border:1px dashed var(--line-strong);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.htrash{border:1px dashed var(--line-strong);border-radius:var(--r-card);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .htrash .row{display:flex;align-items:center;gap:8px;font-size:13px} .htrash .row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pj-home{display:block;width:100%;text-align:left;border:0;background:transparent;padding:6px 10px;border-radius:6px;font-size:13px;color:var(--muted);cursor:pointer}
-.pj-home:hover,.pj-home.on{background:var(--accent-soft);color:var(--accent)}
+.pj-home:hover,.pj-home.on{background:var(--hover);color:var(--ink)}
 .modal{position:fixed;inset:0;z-index:1000;background:rgba(20,24,28,.32);display:grid;place-items:center;padding:20px}
-.modal-card{width:min(420px,100%);background:var(--surface);border-radius:12px;padding:18px 20px;box-shadow:0 12px 40px rgba(20,24,28,.22);display:flex;flex-direction:column;gap:10px}
+.modal-card{width:min(420px,100%);background:var(--surface);border-radius:16px;padding:18px 20px;box-shadow:0 12px 40px rgba(20,24,28,.22);display:flex;flex-direction:column;gap:10px}
 .modal-card h3{margin:0;font-size:16px} .modal-card p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
-.modal-in{border:1px solid var(--line-strong);border-radius:6px;padding:7px 10px;font-size:14px;width:100%}
+.modal-in{border:1px solid var(--line-strong);border-radius:var(--r-ctl);min-height:36px;padding:7px 12px;font-size:14px;width:100%;background:var(--surface);color:var(--ink)}
+.modal-in:focus{outline:none;border-color:var(--accent)}
 .modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
 .btn.danger{background:var(--red);border-color:var(--red);color:#fff}
-.panel{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.panel{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .tabs{flex:0 0 auto;display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);padding:6px 8px 0}
 .tab{flex:0 0 auto;border:none;background:none;padding:8px 10px 10px;border-bottom:2px solid transparent;color:var(--muted);display:flex;gap:6px;align-items:center;font-weight:500}
-.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
 .tab .n{font-family:var(--f-mono);font-size:11px;color:var(--faint)}
 .tab .n.warn{color:var(--amber)}
 .spin{width:12px;height:12px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex:0 0 auto}
@@ -285,12 +298,12 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
 .view h3{margin:0;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sub{font-size:12px;color:var(--muted)}
 .rowx{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.warnbox{border:1px solid var(--amber);background:var(--amber-soft);border-radius:6px;padding:8px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
-.okbox{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:8px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
-.state{border:1px dashed var(--line-strong);border-radius:8px;padding:28px 16px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:center}
+.warnbox{border:1px solid var(--amber);background:var(--amber-soft);border-radius:var(--r-sm);padding:8px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.okbox{border:1px solid var(--line);background:var(--bg);border-radius:var(--r-sm);padding:8px 12px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.state{border:1px dashed var(--line-strong);border-radius:var(--r-card);padding:28px 16px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:center}
 
 /* cite */
-.cite{flex:0 0 auto;font-size:11px;border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:4px;padding:1px 6px;line-height:1.6;white-space:nowrap}
+.cite{flex:0 0 auto;font-size:11px;border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:var(--r-tag);padding:1px 6px;line-height:1.6;white-space:nowrap}
 .cite:hover{border-color:var(--accent);background:var(--accent-soft)}
 .cite.bad{color:var(--amber);border-color:var(--amber)}
 .cites{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
@@ -299,24 +312,26 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
 .was s{color:var(--faint)}
 [contenteditable]{border-radius:3px;outline:none}
 [data-edit]:not([contenteditable]){cursor:pointer;border-radius:3px}
-[data-edit]:not([contenteditable]):hover{background:var(--accent-soft)}
+[data-edit]:not([contenteditable]):hover{background:var(--hover)}
+/* 可修改的文字：悬停时在后面提示“双击修改”（只读演示版不显示） */
+html:not(.ro) [data-edit]:not([contenteditable]):hover::after{content:"双击修改";margin-left:8px;font-size:12px;font-weight:400;color:var(--faint);white-space:nowrap}
 [contenteditable]:hover{background:var(--bg)}
 [contenteditable]:focus{background:var(--bg);box-shadow:0 0 0 1px var(--accent)}
 
 /* files */
-.flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .frow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line)}
 .frow:last-child{border-bottom:none}
 .frow.muted{background:var(--bg)}
 .fbtn{border:none;background:none;padding:0;text-align:left;font-weight:500;word-break:break-all}
 .fbtn:hover{color:var(--accent)}
 .fmeta{font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.frow select{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:4px 6px;font-size:12px;max-width:150px}
+.frow select{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r-sm);padding:4px 6px;font-size:12px;max-width:150px}
 .x{border:none;background:none;color:var(--faint);font-size:18px;line-height:1;padding:2px 6px;border-radius:4px}
 .x:hover{color:var(--red);background:var(--red-soft)}
 
 /* overview */
-.ov{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ov{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .ov-row{display:grid;grid-template-columns:112px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:9px 12px;border-bottom:1px solid var(--line)}
 .ov-row:last-child{border-bottom:none}
 .ov-k{color:var(--muted);font-size:13px}
@@ -330,38 +345,38 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
 .ovg details .ov{margin-top:6px}
 .cats{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tabchat{margin-left:auto} .tabchat[aria-pressed="true"]{color:var(--accent)}
-.rvbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.rvbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--surface)}
 .rvbar b{font-weight:600} .rvbar .sp{flex:1}
 .rv{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;font-size:12px}
-.rv button{border:1px solid var(--line-strong);background:var(--surface);border-radius:5px;padding:1px 8px;font-size:12px;color:var(--muted);cursor:pointer}
-.rv button:hover{color:var(--accent);border-color:var(--accent)}
+.rv button{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r-tag);padding:1px 8px;font-size:12px;color:var(--muted);cursor:pointer}
+.rv button:hover{background:var(--hover);border-color:var(--line-strong)}
 .rv .ok{color:var(--green)} .rv .need{color:var(--amber)}
 .rv.quiet{display:none} .ov-row:hover .rv.quiet,.it:hover .rv.quiet,.sc:hover .rv.quiet{display:flex}
 .rvdel{font-size:12px;color:var(--muted)} .rvdel summary{cursor:pointer}
-.addbtn{border:1px dashed var(--line-strong);background:transparent;border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted);cursor:pointer;align-self:flex-start}
-.addbtn:hover{color:var(--accent);border-color:var(--accent)}
+.addbtn{border:1px dashed var(--line-strong);background:transparent;border-radius:var(--r-sm);padding:4px 10px;font-size:12px;color:var(--muted);cursor:pointer;align-self:flex-start}
+.addbtn:hover{color:var(--ink);background:var(--hover)}
 .addrow{display:flex;gap:6px;align-items:center} .addrow input{flex:1;min-width:0}
-.rvbar select,.rvbar input{font-size:12px;padding:2px 6px;border:1px solid var(--line-strong);border-radius:5px;background:var(--surface);color:inherit}
+.rvbar select,.rvbar input{font-size:12px;min-height:28px;padding:2px 8px;border:1px solid var(--line-strong);border-radius:var(--r-sm);background:var(--surface);color:inherit}
 .wl{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
 .wl button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;text-align:left;display:flex;flex-direction:column;gap:2px;cursor:pointer}
-.wl button:hover{border-color:var(--accent)}
+.wl button:hover{border-color:var(--line-strong);background:var(--hover)}
 .wl b{font-size:18px;color:var(--ink,inherit)} .wl span{font-size:12px;color:var(--muted)}
 .td-when{font-size:12px;color:var(--muted)} .td-role{border-bottom:1px dashed var(--line-strong);padding:0 2px}
 .ovnav{display:flex;gap:6px;flex-wrap:wrap}
-.ovnav button{border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted)}
-.ovnav button:hover{color:var(--accent);border-color:var(--accent)}
+.ovnav button{border:1px solid var(--line-strong);background:var(--surface);border-radius:var(--r-sm);padding:3px 10px;font-size:12px;color:var(--muted)}
+.ovnav button:hover{color:var(--ink);background:var(--hover)}
 .party{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px}
 .party .ov-row{grid-template-columns:64px minmax(0,1fr) auto}
 .party h4{margin:0;padding:8px 12px;font-size:13px;border-bottom:1px solid var(--line);background:var(--bg-soft,transparent)}
 .party .none{color:var(--muted)}
-.insight{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.insight{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r-card);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .insight h3{margin:0;display:flex;gap:8px;align-items:center}
 .insight .pt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:baseline}
-.sc-base{border:1px solid var(--line);border-radius:8px;padding:9px 12px;display:flex;gap:10px;align-items:baseline}
+.sc-base{border:1px solid var(--line);border-radius:var(--r-card);padding:9px 12px;display:flex;gap:10px;align-items:baseline}
 
 /* items */
 .group{display:flex;flex-direction:column;gap:6px}
-.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 12px;border-bottom:1px solid var(--line);border-left:3px solid transparent}
 .it:last-child{border-bottom:none}
 .items.red .it{border-left-color:var(--red)} .items.amber .it{border-left-color:var(--amber)} .items.blue .it{border-left-color:var(--blue)}
@@ -370,16 +385,16 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
 .it-body{min-width:0;display:flex;flex-direction:column;gap:2px}
 .it-meta{font-size:12px;color:var(--muted)}
 .progress{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
-.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--r-sm);overflow:hidden}
 .seg button{border:none;background:var(--surface);padding:3px 10px;font-size:12px;color:var(--muted);white-space:nowrap}
 .seg button+button{border-left:1px solid var(--line-strong)}
-.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--hover);color:var(--ink);font-weight:600}
 .loc{display:flex;flex-direction:column;gap:6px}
 .loc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .loc-head .cite{font-size:12px;padding:2px 8px}
 
 /* changes */
-.chg-card{border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.chg-card{border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:var(--r-card);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .chg-card.clar{border-left-color:var(--blue)}
 .chg-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .chg-top b{flex:1 1 auto;min-width:0}
@@ -395,50 +410,52 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
 .parts{display:flex;height:30px;border-radius:6px;overflow:hidden;font-size:12px;font-weight:500}
 .parts span{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;color:var(--ink);border-right:2px solid var(--surface)}
 .parts span:last-child{border-right:none}
-.sc{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.sc{border:1px solid var(--line);border-radius:var(--r-card);padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .sc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sc-name{font-weight:700;flex:1 1 auto;min-width:0}
-.pts{font-family:var(--f-mono);font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
+.pts{font-family:var(--f-mono);font-size:13px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 .sc-row{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;font-size:13px}
 .sc-row .k{color:var(--muted)}
 
 /* qa */
 .suggest{display:flex;flex-wrap:wrap;gap:6px}
-.suggest button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
-.suggest button:hover{border-color:var(--accent);color:var(--accent)}
+.suggest button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:4px 10px;font-size:12px;color:var(--muted)}
+.suggest button:hover{background:var(--hover);color:var(--ink)}
 .ask{display:flex;gap:8px}
-.ask input{flex:1 1 auto;min-width:0;border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:7px 10px}
+.ask input{flex:1 1 auto;min-width:0;min-height:36px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r-ctl);padding:7px 12px}
+.ask input:focus{outline:none;border-color:var(--accent)}
 .qa{display:flex;flex-direction:column;gap:12px}
-.qa-item{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.qa-item{border:1px solid var(--line);border-radius:var(--r-card);padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .qa-q{font-weight:700}
 .qa-a{white-space:pre-wrap} .qa-a.nf{color:var(--amber)}
 
 .drop{position:fixed;inset:0;z-index:20;background:color-mix(in srgb,var(--bg) 82%,transparent);display:flex;align-items:center;justify-content:center;padding:24px}
 .drop div{border:2px dashed var(--accent);border-radius:12px;padding:40px 32px;background:var(--surface);font-size:16px;font-weight:500;text-align:center}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-size:13px;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:var(--r-sm);font-size:13px;max-width:calc(100% - 32px)}
 
 /* projects sidebar（宿主提供项目存储时显示） */
 .shell{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 .shell.with-pj{grid-template-columns:232px minmax(0,1fr)}
-.projects{display:flex;flex-direction:column;min-height:0;margin-block:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.projects{display:flex;flex-direction:column;min-height:0;margin-block:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .pj-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
 .pj-list{list-style:none;margin:0;padding:6px;overflow:auto;display:flex;flex-direction:column;gap:2px;flex:1 1 auto}
-.pj{position:relative;border-radius:6px}
+.pj{position:relative;border-radius:var(--r-sm)}
 .pj:hover,.pj:focus-within{background:var(--bg)}
-.pj.on{background:var(--accent-soft)}
+.pj.on{background:var(--hover)}
 .pj-open{width:100%;border:none;background:none;text-align:left;padding:7px 8px;display:flex;flex-direction:column;gap:1px;border-radius:6px;min-width:0}
 .pj-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pj.on .pj-name{color:var(--accent)}
+.pj.on .pj-name{color:var(--ink);font-weight:600}
 .pj-meta{font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pj-acts{position:absolute;right:4px;top:5px;display:none;gap:2px}
 .pj:hover .pj-acts,.pj:focus-within .pj-acts{display:flex}
-.pj-acts button{border:1px solid var(--line);background:var(--surface);border-radius:4px;font-size:11px;padding:1px 6px;color:var(--muted)}
-.pj-acts button:hover{color:var(--accent);border-color:var(--accent)}
+.pj-acts button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-tag);font-size:11px;padding:1px 6px;color:var(--muted)}
+.pj-acts button:hover{color:var(--ink);background:var(--hover)}
 .pj-acts button.del:hover{color:var(--red);border-color:var(--red)}
 .pj-empty{padding:12px;font-size:12px;color:var(--muted)}
 .pj-foot{border-top:1px solid var(--line);padding:6px}
-.pjbtn{border:1px solid var(--line-strong);background:var(--surface);border-radius:6px;padding:4px 10px;font-size:13px;white-space:nowrap}
-.pjbtn[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.pjbtn{display:inline-flex;align-items:center;min-height:36px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:var(--r-ctl);padding:0 12px;font-size:14px;white-space:nowrap}
+.pjbtn:hover{background:var(--hover)}
+.pjbtn[aria-expanded="true"]{background:var(--hover);border-color:var(--line-strong)}
 .fname.editable{cursor:pointer;border-bottom:1px dashed var(--line-strong)}
 .fname.editable:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .dropzone{margin:24px;border:2px dashed var(--line-strong);border-radius:12px;padding:40px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface)}
@@ -464,7 +481,7 @@ mark.qhl{background:#ffe066;color:#1b1b1b;border-radius:2px;box-shadow:0 0 0 2px
     <div class="countdown" id="countdown"></div>
     <div class="actions">
       <button class="btn primary" id="newBtn" type="button">打开招标资料</button>
-      <button class="btn primary" id="chatBtn" type="button" data-act="chat" hidden title="在右侧打开 DSH 对话，AI 可以读取当前项目的资料原文和解读结果">问答 · AI</button>
+      <button class="btn" id="chatBtn" type="button" data-act="chat" hidden title="在右侧打开 DSH 对话，AI 可以读取当前项目的资料原文和解读结果">问答 · AI</button>
       <button class="btn" id="modelBtn" type="button" data-act="model" hidden title="解读用的模型">模型</button>
       <button class="btn" id="rerunBtn" type="button" data-act="rerun-ask" hidden>重新解读</button>
       <button class="btn" id="reportBtn" type="button">导出解读报告</button>
@@ -1692,21 +1709,98 @@ function skFromFormat(pages, chapterOf, wholeFile) {
   flush();
   return out.map(({ listy, ...o }) => ({ ...o, src: '格式' }));
 }
-/* “投标文件应包括下列内容：（1）…（2）…” */
+/* “投标文件应包括下列内容：（1）…（2）…”，以及这些写法（苑东生物 AI 平台项目实测漏掉）：
+   - Word 表格一行“投标文件主要组成内容 | 一、本邀请函；”：触发词在左列单元格，第一项在右列；
+   - 大项“一、二、三”下面再分“1、2、”：小项归到大项下，有小项的大项本身不单列；
+   - “投标文件主要材料”后面不编号、一行一项的列表；
+   - “企业质信资料：营业执照复印件……”“客户服务情况，包括……”：名称取冒号或逗号前，其余作为说明（detail）。 */
+const SK_TRIG = /(投标|响应|磋商)文件(应|由|主要)?.{0,6}(包括|包含|组成)[^。]{0,12}[：:]?$/;
+// 单独一行的标题“投标文件主要材料”“响应文件构成”：后面可以是不编号的列表
+const SK_TRIG_HEAD = /^(?:[\d.．、\s]+|[一二三四五六七八九十]{1,3}[、．.])?(投标|响应|应答)文件的?(主要)?(组成|构成|材料|内容|组成内容)([（(][^）)]{0,12}[）)])?[：:]?$/;
+const SK_TRIG_NOT = /格式|密封|签署|递交|份数|装订|正本|副本|编制|有效期|语言|费用|澄清|修改|质疑|截止|不全|不符|无效/;
+const SK_STOP = /^(投标|响应|磋商)文件的?(递交|密封|签署|份数|装订|有效期|修改|撤回|编制)|^(招标|采购)文件的?(澄清|修改|质疑)|^(开标|评标|定标|投标截止|投标保证金|履约)/;
+// 在括号外的第一个分隔符处切开：“法定代表人授权委托书，法定代表人身份证复印件（加盖公章）” → 名称 + 说明
+function skSplit(t, seps) {
+  let d = 0;
+  for (let i = 0; i < t.length; i++) { const c = t[i];
+    if (c === '（' || c === '(') d++; else if (c === '）' || c === ')') d = Math.max(0, d - 1);
+    else if (!d && seps.includes(c)) return [t.slice(0, i), t.slice(i + 1)]; }
+  return [t, ''];
+}
+// 一行列了几份文件（“授权委托书（见附件3）、身份证复印件（加盖公章）、……”）：每段都像文件名时拆成几项
+function skSplitAll(t, seps) {
+  const out = []; let d = 0, st = 0;
+  for (let i = 0; i < t.length; i++) { const c = t[i];
+    if (c === '（' || c === '(') d++; else if (c === '）' || c === ')') d = Math.max(0, d - 1);
+    else if (!d && seps.includes(c)) { out.push(t.slice(st, i)); st = i + 1; } }
+  out.push(t.slice(st)); return out.map(x => x.replace(/^[、，,；;]+|[；;。，,]+$/g, '')).filter(Boolean);
+}
+function skItems(raw) {
+  const t = String(raw || '').replace(/\s+/g, '').replace(/^[、，,.．]+/, '').replace(/[；;。，,]+$/, '');
+  if (!skSplit(t, '：:')[1]) {                                         // 有“名称：说明”的不拆
+    const parts = skSplitAll(t, '、，,；;');
+    if (parts.length > 1 && parts.every(x => x.length <= 40 && skDocLike(x))) return parts.map(x => ({ name: x, detail: '' }));
+  }
+  return [skItem(t)];
+}
+function skItem(raw) {
+  const t = String(raw || '').replace(/\s+/g, '').replace(/^[、，,.．]+/, '').replace(/[；;。，,]+$/, '');
+  let [name, detail] = skSplit(t, '：:');
+  if (!detail) [name, detail] = skSplit(name, '，,；;');   // 没有冒号时在第一个逗号处切；不在顿号处切：“系统、设备集成的规划”是一项
+  name = name.replace(/^[《“☑□]|[》”]$/g, '').replace(/[；;。]+$/, '');
+  return { name, detail: detail.replace(/^[；;，,]+|[；;。，,]+$/g, '') };
+}
+const skItemOk = n => n.length >= 2 && n.length <= 40 && skBalanced(n) && !/[■□☑]/.test(n) &&
+  !/^(注|说明|备注|如|若|根据|按照|以上|上述|其中|如果|投标人应|投标人须|填写|详见|第.{1,3}[章节])|^(投标|响应|磋商)文件(由|应|根据|包括)|详见|见第|如下/.test(n) && !/(包括|组成)/.test(n.replace(/(人员|机构)组成/g, ''));
+// 不编号列表里的一行要像一份文件的名字，才算一项
+const skDocLike = n => SK_DOC.test(n) || /(规划|标准|措施|建议|复印件|执照|证|业绩|人员)$/.test(n) ||
+  SK_DOC.test(n.replace(/[（(][^）)]*[）)]$/, '')) || /(规划|标准|措施|建议|复印件|执照|证|业绩)$/.test(n.replace(/[（(][^）)]*[）)]$/, ''));
 function skFromClause(pages) {
   const out = [];
   pages.forEach((txt, i) => {
     const lines = String(txt || '').split('\n').map(s => s.trim()).filter(Boolean);
     lines.forEach((l, j) => {
-      const lx = l.replace(/\s+/g, '');
-      if (!/(投标|响应|磋商)文件(应|由|主要)?.{0,6}(包括|包含|组成)[^。]{0,12}[：:]?$/.test(lx) || /格式|密封|签署|递交/.test(lx)) return;
-      for (let k = j + 1, n = 0; k < lines.length && n < 30; k++, n++) {
-        const x = lines[k].replace(/\s+/g, '');
-        if (/^\d+\.\d+/.test(x)) break;                        // 下一条款
-        const m = x.match(/^(?:[（(]\d{1,2}[)）]|\d{1,2}[、.．](?!\d)|[①-⑳])(.+)$/);
-        if (!m) { if (out.length && n > 2 && !/信封|部分|文件[：:]?$/.test(x)) break; continue; }
-        const t = skClean(m[1]);
-        if (t.length >= 2 && t.length <= 40 && !SK_BAD.test(t) && !/(包括|组成)/.test(t)) out.push({ name: t, page: i + 1, group: null, src: '组成条款' });
+      const cells = l.split(' | ').map(c => c.replace(/\s+/g, ''));
+      const at = cells.findIndex(c => c.length <= 40 && (SK_TRIG.test(c) || SK_TRIG_HEAD.test(c)) && !SK_TRIG_NOT.test(c));
+      if (at < 0) return;
+      const queue = [...cells.slice(at + 1).filter(Boolean)];
+      const canPlain = cells.length === 1 && SK_TRIG_HEAD.test(cells[0]);   // 只有单独一行的标题（如“投标文件主要材料”）后面才认不编号的列表
+      for (let k = j + 1; k < lines.length && k <= j + 40; k++) queue.push(lines[k]);
+      const got = []; let mode = null, parent = null;
+      for (let n = 0; n < queue.length; n++) {
+        const raw = queue[n], x = raw.replace(/\s+/g, '');
+        if (/^\d+\.\d+/.test(x)) break;                                   // 下一条款
+        if (raw.includes(' | ') && n >= cells.length - at - 1) {           // 表格的下一行带了自己的左列标题：本格结束
+          const head = raw.split(' | ')[0].replace(/\s+/g, ''); if (head) break; }
+        const big = x.match(/^(?:([一二三四五六七八九十]{1,3})[、．.]|[（(]([一二三四五六七八九十]{1,3})[)）])(.+)$/);
+        const small = x.match(/^(?:[（(]\d{1,2}[)）]|\d{1,2}[、.．](?!\d)|[①-⑳])(.+)$/);
+        if (big || small) {
+          if (mode === 'plain') break;
+          mode = 'num';
+          const its = big ? [skItem(big[3])] : skItems(small[1]);       // 大项是分组名，不拆
+          for (const it of its) {
+            if (!skItemOk(it.name)) continue;
+            if (big) { parent = { ...it, kids: 0 }; got.push({ ...it, lvl: 1, ref: parent }); }
+            else { if (parent) parent.kids++; got.push({ ...it, lvl: 2, group: parent ? parent.name : null }); }
+          }
+          continue;
+        }
+        if (mode === 'plain') {                                           // 不编号的列表：一行一项，遇到长句、别的条款标题、不像文件名的行就结束
+          if (x.length > 80 || SK_STOP.test(x) || /。./.test(x)) break;
+          const its = skItems(x); if (!its.every(it => skItemOk(it.name) && skDocLike(it.name))) break;
+          for (const it of its) got.push({ ...it, lvl: 1 });
+          continue;
+        }
+        if (!mode && canPlain && x.length <= 60 && !SK_STOP.test(x)) {     // 标题后第一行就像文件名：按不编号列表处理
+          const it = skItem(x); if (skItemOk(it.name) && skDocLike(it.name)) { mode = 'plain'; got.push({ ...it, lvl: 1 }); continue; }
+        }
+        if (got.length && n > 2 && !/信封|部分|文件[：:]?$/.test(x)) break;   // 编号列表中间夹的说明行（如“第一个信封（商务及技术文件）”）跳过
+      }
+      for (const g of got) {
+        if (g.lvl === 1 && g.ref && g.ref.kids) continue;                 // 有小项的大项只作分组名
+        const same = out.find(o => skNorm(o.name) === skNorm(g.name) && (o.group || '') === (g.group || ''));
+        if (same) { if (g.detail && !same.detail) same.detail = g.detail; continue; }
+        out.push({ name: g.name, page: i + 1, group: g.group || null, src: '组成条款', detail: g.detail || '' });
       }
     });
   });
@@ -1738,6 +1832,7 @@ function skMatch(a,b){ const x=skNorm(a), y=skNorm(b); if(!x||!y) return 0; if(x
 /* 材料清单 = 骨架里的表单（标书列明，一张不少，按标书顺序） + 其他材料（资格、评分等要求的证明）。
    骨架在显示时计算，所以旧的解读结果也能用；骨架里有、模型没列的表单由程序补上并标明 */
 const mtName=o=>o.sk?o.sk.name:o.x.name;
+const skSrc=o=>o.sk?.src==='组成条款'?'组成条款列明':'格式章节列明';
 function materialsModel(){
   const items=S.res.materials?.items||[], used=new Set(), forms=[];
   for(const sk of projectSkeleton()){
@@ -1746,7 +1841,9 @@ function materialsModel(){
     if(best>=0){ used.add(best); forms.push({x:items[best], i:best, key:'mt:'+best, sk}); continue; }
     const f=fileById(sk.file);
     forms.push({ key:'mt:sk:'+skNorm(sk.name)+':'+sk.page, sk, added:true,
-      x:{ name:sk.name, need:/如适用|如有|若有|不适用|仅.{0,12}提供/.test(sk.name)?'如适用':'必须', form:`按投标文件格式填写（${f?shortLabel(f)+' ':''}第 ${sk.page} ${f?.unit||'页'}）`, file:sk.file, page:sk.page, quote:sk.name, changedFrom:null } });
+      x:{ name:sk.name, need:/如适用|如有|若有|不适用|仅.{0,12}提供/.test(sk.name)?'如适用':'必须',
+        form:sk.src==='组成条款'?(sk.detail||`投标文件组成条款列明（${f?shortLabel(f)+' ':''}第 ${sk.page} ${f?.unit||'页'}）`):`按投标文件格式填写（${f?shortLabel(f)+' ':''}第 ${sk.page} ${f?.unit||'页'}）`,
+        file:sk.file, page:sk.page, quote:sk.name, changedFrom:null } });
   }
   return { forms, others:items.map((x,i)=>({x, i, key:'mt:'+i})).filter(o=>!used.has(o.i)) };
 }
@@ -1983,7 +2080,7 @@ function vOverview(){
   ${groups}
   ${customBlock(o,p)}
   ${lists.length?`<div class="group"><h3>报价清单</h3>${lists.map(f=>`<div class="okbox"><div><b>${esc(f.name)}</b></div><div>${esc(summaryText(f))}</div><div><button class="cite" type="button" data-view="${f.id}">打开清单</button></div></div>`).join('')}</div>`:''}
-  <p class="sub" style="margin:0">单击任一项的文字或右侧出处按钮，会跳到原文并标黄；双击文字可以修改。带“?”的出处表示引文没有精确匹配，需要人工核对。</p>`;
+  <p class="sub" style="margin:0">单击任一项的文字或右侧出处按钮，会跳到原文并标黄；双击文字或点“修改”可以改。带“?”的出处表示引文没有精确匹配，需要人工核对。</p>`;
 }
 function vChanges(){
   const c=S.res.changes; if(!c) return stateBlock('changes','整理补遗变更');
@@ -2029,7 +2126,7 @@ const rvHide=(key,x)=>S.rvOnly&&!needsRv(key,x);
 function rvCtl(key,x,{del=true,confirm=true}={}){ if(roHere()) return '';
   const st=rvState(key), r=S.rv[key], F=st==='todo'?flagsOf(key,x):[];
   const lab=st==='ok'?`<span class="ok">✓ 已确认${r?.by?' · '+esc(r.by):''}</span>`:st==='edit'?`<span class="ok">已人工修改${r?.by?' · '+esc(r.by):''}</span>`:F.length?`<span class="need">需人工核对：${esc(F.join('、'))}</span>`:'<span class="sub">待核对</span>';
-  return `<div class="rv${st==='todo'&&!F.length?' quiet':''}">${lab}${confirm&&st==='todo'?`<button type="button" data-rv="ok" data-key="${key}">确认无误</button>`:''}${st==='ok'&&r?`<button type="button" data-rv="undo" data-key="${key}">撤销确认</button>`:''}${del?`<button type="button" data-rv="del" data-key="${key}" title="判定为错误：不再显示，也不进报告，可以恢复">删除</button>`:''}</div>`; }
+  return `<div class="rv${st==='todo'&&!F.length?' quiet':''}">${lab}${confirm&&st==='todo'?`<button type="button" data-rv="ok" data-key="${key}">确认无误</button>`:''}${st==='ok'&&r?`<button type="button" data-rv="undo" data-key="${key}">撤销确认</button>`:''}<button type="button" data-editbtn title="修改这一条的文字（也可以直接双击文字）">修改</button>${del?`<button type="button" data-rv="del" data-key="${key}" title="判定为错误：不再显示，也不进报告，可以恢复">删除</button>`:''}</div>`; }
 function labelOf(key){ const [m,a,b]=key.split(':');
   if(m==='ov'){ const f=OV.find(x=>x[0]===a)||CUSTOM.map(c=>['cu_'+c.id,c.name]).find(x=>x[0]===a); return (a.startsWith('cu_')?'自定义 · ':'速览 · ')+(f?ovLabel(a,f[1]):a); }
   if(m==='rk'){ const g=RISK_SHOW.find(x=>x[0]===a); const t=b?.startsWith('a')?S.added['rk:'+a]?.[+b.slice(1)]?.text:rkList(S.res.risks,a)[+b]?.text; return `${g?.[1]||'风险'} · ${String(t||'').slice(0,24)}`; }
@@ -2081,7 +2178,7 @@ function vRisks(){
   const all=RISK_SHOW.flatMap(([g])=>rkList(r,g).map((_,i)=>`rk:${g}:${i}`)); const done=all.filter(k=>S.checks[k]).length;
   const si=r.starInfo&&STAR_LABEL[r.starInfo.meaning];
   const meta=(g,x)=>g==='invalid'&&x.stage?`<span class="chip plain sm">${esc(x.stage)}</span>`:g==='contract'?`<span class="chip blue sm">${esc(x.kind)}</span>${x.advice?` 应对：${esc(x.advice)}`:''}`:g==='qualification'&&x.proof?`证明材料：${esc(x.proof)}`:'';
-  return segFailedBox(r)+rvBar('risks')+`<div class="rowx"><span class="sub">已综合正文、需求书、合同、清单和补遗。单击条目文字或右侧出处按钮可以跳到原文并标黄；双击文字可以修改。确认无误就勾上，错的可以删除，漏的可以补充。</span></div>`+
+  return segFailedBox(r)+rvBar('risks')+`<div class="rowx"><span class="sub">已综合正文、需求书、合同、清单和补遗。单击条目文字或右侧出处按钮可以跳到原文并标黄；双击文字或点“修改”可以改。确认无误就勾上，错的可以删除，漏的可以补充。</span></div>`+
   (si?`<div class="okbox"><div class="rowx"><span>本项目文件里的“★”表示：<b>${esc(si)}</b></span>${citeBtn(r.starInfo)}</div>${r.starDropped?`<div class="sub">另有 ${r.starDropped} 条带 ★ 的评分参数没有列为实质性要求，见“评分拆解”。</div>`:''}</div>`:'')+
   RISK_SHOW.map(([g,label,color,sub])=>{ const L=rkList(r,g);
     if(g==='contract'&&!('contract' in r)) return `<div class="group"><h3>${label}</h3><div class="sub">这是旧版解读结果，没有这一组。点“重新解读”可以补上。</div></div>`;
@@ -2148,8 +2245,8 @@ function vMaterials0(forms,others,A){
   const chip=n=>n.includes('加分')?'green':n.includes('适用')?'plain':'red';
   // 表单用标书自己的名称；模型给的出处常指向须知里的要求，另给一个直达表单格式页的链接
   const fmtLink=o=>{ if(!o.sk) return ''; const f=fileById(o.sk.file); if(!f||(o.x.file===o.sk.file&&o.x.page===o.sk.page)) return '';
-    return ` <button class="cite" type="button" data-cf="${f.id}" data-cp="${o.sk.page}" data-cq="${esc(o.sk.name)}" title="查看这张表单的格式">格式 · 第${o.sk.page}${f.unit}</button>`; };
-  const row=(o,compact)=>itemRow(o.key,mtName(o),o.x,`${o.sk?'<span class="chip blue sm">格式章节列明</span> ':''}<span class="chip ${chip(o.x.need)} sm">${esc(o.x.need)}</span> ${esc(o.x.form)}${o.added?' <span class="sub">（解读结果中没有单独列出，按格式章节补充）</span>':''}${fmtLink(o)}`,o.x.changedFrom,compact,rvCtl(o.key,o.x));
+    return ` <button class="cite" type="button" data-cf="${f.id}" data-cp="${o.sk.page}" data-cq="${esc(o.sk.name)}" title="查看标书里列出这一项的位置">${o.sk.src==='组成条款'?'条款':'格式'} · 第${o.sk.page}${f.unit}</button>`; };
+  const row=(o,compact)=>itemRow(o.key,mtName(o),o.x,`${o.sk?`<span class="chip blue sm">${skSrc(o)}</span> `:''}${o.sk?.group?`<span class="chip plain sm" title="标书里所属的大项">${esc(o.sk.group)}</span> `:''}<span class="chip ${chip(o.x.need)} sm">${esc(o.x.need)}</span> ${esc(o.x.form)}${o.added?` <span class="sub">（解读结果中没有单独列出，按${o.sk.src==='组成条款'?'组成条款':'格式章节'}补充）</span>`:''}${fmtLink(o)}`,o.x.changedFrom,compact,rvCtl(o.key,o.x));
   const head=`<div class="rowx"><span class="progress">已准备 ${done} / ${all.length}</span><div class="actions"><div class="seg" role="group" aria-label="排列方式"><button type="button" data-mtview="page" aria-pressed="${mtView==='page'}">按原文位置</button><button type="button" data-mtview="bind" aria-pressed="${mtView==='bind'}">按装订顺序</button><button type="button" data-mtview="use" aria-pressed="${mtView==='use'}">按用途</button></div><button class="btn sm" type="button" data-act="csv" ${all.length?'':'disabled'}>导出清单（Excel 可打开）</button></div></div>`;
   const fb=segFailedBox(m);
   if(!all.length) return fb+head+'<div class="sub">没有找到材料要求。</div>';
@@ -2350,6 +2447,8 @@ function render(){
   else rl.hidden=true;
   if(!S.files.length){ $('#view').innerHTML=''; return; }
   $('#view').innerHTML={files:vFiles,overview:vOverview,changes:vChanges,risks:vRisks,scoring:vScoring,materials:vMaterials,todo:vTodo,qa:vQA}[S.tab]();
+  document.documentElement.classList.toggle('ro',roHere());
+  $('#view').querySelectorAll('[data-editbtn]').forEach(b=>{ if(!b.closest(EDIT_ROW)?.querySelector('[data-edit]')) b.remove(); });
 }
 
 /* ---------- exports ---------- */
@@ -2412,9 +2511,10 @@ async function save(filename,data){
 }
 async function exportReport(){ if(!MODS.some(m=>S.res[m])){ toast('还没有解读结果可以导出'); return; } if(!window.JSZip){ toast('导出组件没有加载'); return; } save(baseName()+'_解读报告.docx', await buildDocx(JSZip, reportBlocks())); }
 async function exportOutline(){ if(!window.JSZip){ toast('导出组件没有加载'); return; } save(baseName()+'_技术标提纲.docx', await buildDocx(JSZip, outlineBlocks())); }
-function exportCsv(){ save(baseName()+'_材料清单.csv', csvOf([['序号','材料','来源','用途','要求','形式要求','缺了会怎样','原文出处','补遗修改','已准备','负责人','备注'],...materialsOrder().map((o,n)=>[n+1,ed(o.key,mtName(o)),o.sk?'格式章节列明':'其他要求',useOf(o),o.x.need,o.x.form,whyOf(o),pageRef(o.x),o.x.changedFrom?'原为：'+o.x.changedFrom:'',S.checks[o.key]?'是':'','',''])])); }
+function exportCsv(){ save(baseName()+'_材料清单.csv', csvOf([['序号','材料','来源','用途','要求','形式要求','缺了会怎样','原文出处','补遗修改','已准备','负责人','备注'],...materialsOrder().map((o,n)=>[n+1,ed(o.key,mtName(o)),o.sk?skSrc(o):'其他要求',useOf(o),o.x.need,o.x.form,whyOf(o),pageRef(o.x),o.x.changedFrom?'原为：'+o.x.changedFrom:'',S.checks[o.key]?'是':'','',''])])); }
 
 /* ---------- events ---------- */
+const EDIT_ROW='li.it,.ov-row,.sc,.chg-card,.pt';
 function pick_(mode){ pickMode=mode; $('#fileInput').click(); }
 document.addEventListener('click',e=>{
   // 单击条目文字 = 查看原文（触发同一行的出处按钮）；双击才进入修改
@@ -2423,6 +2523,7 @@ document.addEventListener('click',e=>{
     const cb=row?.querySelector('.cite[data-cf]'); if(cb){ cb.click(); return; } }
   const j=e.target.closest('[data-jump]'); if(j){ document.getElementById(j.dataset.jump)?.scrollIntoView({behavior:smooth(),block:'start'}); return; }
   const rvb=e.target.closest('[data-rv]'); if(rvb){ setRv(rvb.dataset.key,rvb.dataset.rv); return; }
+  const eb=e.target.closest('[data-editbtn]'); if(eb){ startEdit(eb.closest(EDIT_ROW)?.querySelector('[data-edit]')); return; }
   const t=e.target.closest('[data-tab],[data-cf],[data-act],[data-ask],[data-view],[data-remove],[data-pid],[data-pren],[data-pdel],[data-mtview]'); if(!t) return;
   if(t.dataset.mtview){ mtView=t.dataset.mtview; try{ localStorage.setItem('bidread3:mtView',mtView); }catch(e){} render(); return; }
   if(t.dataset.pid){ openProject(t.dataset.pid); return; }
@@ -2483,9 +2584,11 @@ document.addEventListener('change',e=>{
   const r=e.target.closest('[data-role]');
   if(r){ const f=fileById(r.dataset.role); if(!f) return; f.role=r.value; orderAmends(); S.stale=true; citeCache.clear(); persist(); renderDoc(); render(); }
 });
-document.addEventListener('dblclick',e=>{ const el=e.target.closest('[data-edit]'); if(!el||el.isContentEditable||roHere()) return;
+function startEdit(el){ if(!el||el.isContentEditable||roHere()) return;
   el.setAttribute('contenteditable','plaintext-only'); el.focus();
-  const r=document.createRange(); r.selectNodeContents(el); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); });
+  const r=document.createRange(); r.selectNodeContents(el); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  toast('正在修改：回车保存，Esc 取消'); }
+document.addEventListener('dblclick',e=>startEdit(e.target.closest('[data-edit]')));
 document.addEventListener('focusout',e=>{
   const el=e.target.closest?.('[data-edit]'); if(!el) return;
   const key=el.dataset.edit; const v=el.textContent.trim(); const orig=origOf(key);
